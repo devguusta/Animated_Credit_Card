@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:credit_card/credit_card/credit_card.dart';
+import 'package:credit_card/credit_card/credit_card_back.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,12 +15,16 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   final _numberController = TextEditingController();
   final _validityController = TextEditingController();
   final _nameController = TextEditingController();
-
+  final _cvvController = TextEditingController();
+  final _cvvFocus = FocusNode();
   final _creditCardController = ValueNotifier<CardEntity>(const CardEntity());
+
+  late final AnimationController cardAnimationController;
+  late final Animation animation;
 
   @override
   void initState() {
@@ -25,6 +32,25 @@ class _MyAppState extends State<MyApp> {
     _numberController.addListener(changeCardData);
     _nameController.addListener(changeCardData);
     _validityController.addListener(changeCardData);
+    _cvvController.addListener(changeCardData);
+
+    _cvvFocus.addListener(() {
+      if (_cvvFocus.hasFocus) {
+        cardAnimationController.forward();
+      } else {
+        cardAnimationController.reverse();
+      }
+    });
+
+    cardAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+      reverseDuration: const Duration(
+        milliseconds: 300,
+      ),
+    );
+    animation = Tween(begin: 0.0, end: math.pi).animate(CurvedAnimation(
+        parent: cardAnimationController, curve: Curves.bounceOut));
   }
 
   void changeCardData() {
@@ -32,6 +58,7 @@ class _MyAppState extends State<MyApp> {
       validity: _validityController.text,
       name: _nameController.text,
       number: _numberController.text,
+      cvv: _cvvController.text,
     );
   }
 
@@ -41,6 +68,7 @@ class _MyAppState extends State<MyApp> {
     _validityController.dispose();
     _nameController.dispose();
     _creditCardController.dispose();
+    _cvvController.dispose();
     super.dispose();
   }
 
@@ -59,15 +87,35 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: ValueListenableBuilder<CardEntity>(
-                    valueListenable: _creditCardController,
-                    builder: (context, value, child) {
-                      return CreditCard(
-                        validity: value.validity,
-                        number: value.number,
-                        name: value.name,
-                      );
-                    }),
+                child: AnimatedBuilder(
+                  animation: animation,
+                  builder: (contex, child) {
+                    return Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, .002)
+                        ..rotateY(animation.value),
+                      child: animation.value > math.pi / 2
+                          ? ValueListenableBuilder<CardEntity>(
+                              valueListenable: _creditCardController,
+                              builder: (context, value, child) {
+                                return CreditCardBack(
+                                  cvv: value.cvv,
+                                );
+                              })
+                          : ValueListenableBuilder<CardEntity>(
+                              valueListenable: _creditCardController,
+                              builder: (context, value, child) {
+                                return CreditCard(
+                                  validity: value.validity,
+                                  number: value.number,
+                                  name: value.name,
+                                );
+                              },
+                            ),
+                    );
+                  },
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -96,6 +144,17 @@ class _MyAppState extends State<MyApp> {
                   controller: _validityController,
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextFormField(
+                  focusNode: _cvvFocus,
+                  decoration: const InputDecoration(
+                    labelText: 'Security code',
+                  ),
+                  controller: _cvvController,
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -108,11 +167,13 @@ class CardEntity {
   final String number;
   final String validity;
   final String name;
+  final String cvv;
 
   const CardEntity({
     Key? key,
     this.number = "",
     this.validity = "",
     this.name = "",
+    this.cvv = "",
   }) : super();
 }
