@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CreditCard extends StatelessWidget {
-  const CreditCard({Key? key}) : super(key: key);
+  final ValueNotifier<String> numberController;
+  final ValueNotifier<String> validityController;
+  final ValueNotifier<String> nameController;
+  const CreditCard({
+    Key? key,
+    required this.numberController,
+    required this.validityController,
+    required this.nameController,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -79,14 +87,19 @@ class CreditCard extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          const Text(
-                            "1234 4567 9101 7788",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
-                            ),
+                          ValueListenableBuilder<String>(
+                            valueListenable: numberController,
+                            builder: (context, value, child) {
+                              return Text(
+                                value,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.2,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -112,8 +125,8 @@ class CreditCard extends StatelessWidget {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               "VALID\nTHRU",
                               style: TextStyle(
                                 color: Colors.grey,
@@ -121,27 +134,35 @@ class CreditCard extends StatelessWidget {
                                 fontSize: 12,
                               ),
                             ),
-                            SizedBox(width: 6),
-                            Text(
-                              "08/23",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
+                            const SizedBox(width: 6),
+                            ValueListenableBuilder<String>(
+                                valueListenable: validityController,
+                                builder: (context, value, _) {
+                                  return Text(
+                                    value,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  );
+                                }),
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          "Gustavo S C Cabral".toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
+                        ValueListenableBuilder<String>(
+                            valueListenable: nameController,
+                            builder: (context, value, _) {
+                              return Text(
+                                value.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  letterSpacing: 1.2,
+                                ),
+                              );
+                            }),
                       ],
                     ),
                     const Expanded(
