@@ -11,7 +11,21 @@ class CreditCard extends StatelessWidget {
         aspectRatio: 480 / 300,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black,
+            gradient: LinearGradient(
+              colors: [
+                Colors.black,
+                Colors.black.withOpacity(0.8),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black87,
+                offset: Offset(5, 5),
+                blurRadius: 10,
+              ),
+            ],
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
