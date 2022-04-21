@@ -13,19 +13,37 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final ValueNotifier<String> _numberController = ValueNotifier<String>('');
-  final ValueNotifier<String> _validityController = ValueNotifier<String>('');
-  final ValueNotifier<String> _nameController = ValueNotifier<String>('');
+  final _numberController = TextEditingController();
+  final _validityController = TextEditingController();
+  final _nameController = TextEditingController();
+
+  final _creditCardController = ValueNotifier<CardEntity>(const CardEntity());
+
+  @override
+  void initState() {
+    super.initState();
+    _numberController.addListener(changeCardData);
+    _nameController.addListener(changeCardData);
+    _validityController.addListener(changeCardData);
+  }
+
+  void changeCardData() {
+    _creditCardController.value = CardEntity(
+      validity: _validityController.text,
+      name: _nameController.text,
+      number: _numberController.text,
+    );
+  }
 
   @override
   void dispose() {
     _numberController.dispose();
     _validityController.dispose();
     _nameController.dispose();
+    _creditCardController.dispose();
     super.dispose();
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -41,37 +59,41 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: CreditCard(
-                  validityController: _validityController,
-                  numberController: _numberController,
-                  nameController: _nameController,
-                ),
+                child: ValueListenableBuilder<CardEntity>(
+                    valueListenable: _creditCardController,
+                    builder: (context, value, child) {
+                      return CreditCard(
+                        validity: value.validity,
+                        number: value.number,
+                        name: value.name,
+                      );
+                    }),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
+                child: TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Name',
                   ),
-                  onChanged: (value) => _nameController.value = value,
+                  controller: _nameController,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
+                child: TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Card number',
                   ),
-                  onChanged: (value) => _numberController.value = value,
+                  controller: _numberController,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
+                child: TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Validity',
                   ),
-                  onChanged: (value) => _validityController.value = value,
+                  controller: _validityController,
                 ),
               ),
             ],
@@ -80,4 +102,17 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+class CardEntity {
+  final String number;
+  final String validity;
+  final String name;
+
+  const CardEntity({
+    Key? key,
+    this.number = "",
+    this.validity = "",
+    this.name = "",
+  }) : super();
 }

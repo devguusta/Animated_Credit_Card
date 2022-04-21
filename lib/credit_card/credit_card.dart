@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CreditCard extends StatelessWidget {
-  final ValueNotifier<String> numberController;
-  final ValueNotifier<String> validityController;
-  final ValueNotifier<String> nameController;
+  final String number;
+  final String validity;
+  final String name;
   const CreditCard({
     Key? key,
-    required this.numberController,
-    required this.validityController,
-    required this.nameController,
+    required this.number,
+    required this.validity,
+    required this.name,
   }) : super(key: key);
 
   @override
@@ -87,19 +87,14 @@ class CreditCard extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          ValueListenableBuilder<String>(
-                            valueListenable: numberController,
-                            builder: (context, value, child) {
-                              return Text(
-                                value,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.2,
-                                ),
-                              );
-                            },
+                          Text(
+                            number,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ],
                       ),
@@ -120,50 +115,52 @@ class CreditCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Text(
-                              "VALID\nTHRU",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                    Flexible(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "VALID\nTHRU",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 6),
-                            ValueListenableBuilder<String>(
-                                valueListenable: validityController,
-                                builder: (context, value, _) {
-                                  return Text(
-                                    value,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  );
-                                }),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        ValueListenableBuilder<String>(
-                            valueListenable: nameController,
-                            builder: (context, value, _) {
-                              return Text(
-                                value.toUpperCase(),
+                              const SizedBox(width: 6),
+                              Text(
+                                validity,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                name.toUpperCase(),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: name.length < 25 ? 14 : 10,
                                   letterSpacing: 1.2,
                                 ),
-                              );
-                            }),
-                      ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const Expanded(
                       child: Align(
